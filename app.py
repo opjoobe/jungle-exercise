@@ -38,30 +38,9 @@ def show_result():
 def show_login():
     return render_template('login.html')
 
-@app.route('/signup', methods=('GET', 'POST'))
-def signup():
-    if request.method == 'GET' :
-        return render_template('signup.html')
-    elif request.method == 'POST' :
-        inputData = request.form
-        
-        userId = inputData['userid']
-        userPw = inputData['password']
-        userName = inputData['username']
-
-        #비밀번호암호화
-        hashedPw = bcrypt.hashpw(userPw.encode('utf-8'), bcrypt.gensalt())
-
-        #정글 a반 인원인지 and 이미가입된 회원은 아닌지 확인 후 등록
-        junglerFound = db.junglers.find_one({"username" : userName}, {'_id': False})
-        userFound = db.user.find_one({"username" : userName}, {'_id': False})
-
-        if (junglerFound is not None and userFound is None) :
-            doc = {"userid" : userId, "password" : hashedPw, "username" : userName}
-            db.user.insert_one(doc)
-            return jsonify({"result" : "success"})
-        else :
-            return jsonify({"result" : "fail"})
+@app.route('/signup', methods=['GET'])
+def show_signup():
+    return render_template('signup.html')
 
 # API 역할을 하는 부분
 
@@ -97,6 +76,29 @@ def delete_count():
     # 3. 성공하면 success 메시지를 반환합니다.
     return jsonify({'result': 'success', 'msg': '삭제 완료! 안녕!'})
     
+#회원가입기능
+@app.route('/signup', methods=("POST"))
+def signup():
+    inputData = request.form
+    
+    userId = inputData['userid']
+    userPw = inputData['password']
+    userName = inputData['username']
+
+    #비밀번호암호화
+    hashedPw = bcrypt.hashpw(userPw.encode('utf-8'), bcrypt.gensalt())
+
+    #정글 a반 인원인지 and 이미가입된 회원은 아닌지 확인 후 등록
+    junglerFound = db.junglers.find_one({"username" : userName}, {'_id': False})
+    userFound = db.user.find_one({"username" : userName}, {'_id': False})
+
+    if (junglerFound is not None and userFound is None) :
+        doc = {"userid" : userId, "password" : hashedPw, "username" : userName}
+        db.user.insert_one(doc)
+        return jsonify({"result" : "success"})
+    else :
+        return jsonify({"result" : "fail"})
+
 
 #로그인기능
 @app.route('/login', methods=['POST'])
@@ -123,14 +125,15 @@ def user_login() :
         }
         )
 
-@app.route('/logout', methods=['POST'])
+#로그아웃기능
+@app.route('/logout', methods=['GET'])
 @jwt_required()
 def user_logout() :
     jti = get_jwt()['jti']
     jwt_blocklist.add(jti)
     return jsonify({"result": "success", "msg": "로그아웃 완료"}) #index로 redirect해줘야하나?
 
-
+#운동등록기능
 @app.route('/register', methods=['POST'])
 @jwt_required()
 def register() :
