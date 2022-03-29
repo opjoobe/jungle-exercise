@@ -30,22 +30,22 @@ def home():
             homeDict[time].append({"type":type, "players":players})
     return render_template('index.html', homeDict = homeDict)
 
-# @app.route('/mypage')
-# def show_result():
-#     results = list()
-#     res = dict()
-#     for time in times:
-#         res[time] = list()
-#         for type in types:
-#             players = list(db.service.find({"time":time,"type":type}))
-#             res[time].append({"type":type, "players":players})
-#     print(res)
+@app.route('/result')
+def show_result():
+    # results = list()
+    # res = dict()
+    # for time in times:
+    #     res[time] = list()
+    #     for type in types:
+    #         players = list(db.service.find({"time":time,"type":type}))
+    #         res[time].append({"type":type, "players":players})
+    # print(res)
             
-#     for time, type in itertools.product(times, types):
-#         players = list(db.service.find({"time":time, "type":type}))
-#         results.append({"time":time, "type":type, "players":players})
-#     print(results, "왜안나와")
-#     return render_template('result.html', results=results)
+    # for time, type in itertools.product(times, types):
+    #     players = list(db.service.find({"time":time, "type":type}))
+    #     results.append({"time":time, "type":type, "players":players})
+    # print(results, "왜안나와")
+    return render_template('result.html')
 
 @app.route('/login')
 def show_login():
@@ -57,15 +57,16 @@ def show_signup():
 
 # API 역할을 하는 부분
 
-@app.route('/api/list', methods=['GET'])
-def show_member_counts():
+@app.route('/register', methods=['POST'])
+def register():
     time_receive = request.form['time_give'] # 1. 클라이언트가 전달한 time_give 변수를 time_receive 변수에 넣음
     type_receive = request.form['type_give'] # 2. 클라이언트가 전달한 type_give 변수를 type_receive 변수에 넣음
-
-    # 1. db에서 위의 조건을 바탕으로 DB 목록 전체를 검색해서, time과 type가 일치하는 인원 수를 가져옵니다.
-    counts = len(list(db.service.find_one({"time":time_receive, "type":type_receive}, {"_id":False})))
+    # userid = 
+    # 해당 로그인 사용자의 db를 업데이트 시켜줌. 
+    # db.service.update_one({'userid':userid},{'$set':{"time":time_receive,"type":type_receive}})
+    #db.service.insert_one({'name':'김소정', 'time':time_receive, 'type':type_receive})
     # 2. 성공하면 success 메시지와 함께 counts 라는 운동 인원 수를 클라이언트에 전달합니다.
-    return jsonify({'result': 'success', 'counts': counts, 'msg':'운동인원 불러오기 완료!'})
+    return jsonify({'result': 'success', 'msg':'참가 완료!'})
 
 # 운동하기 클릭했을 경우 DB 업데이트
 @app.route('/api/add', methods=['POST'])
