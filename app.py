@@ -8,6 +8,11 @@ app = Flask(__name__)
 client = MongoClient('localhost', 27017)
 db = client.dbjungle
 
+app.config.update(
+    DEBUG=True,
+    JWT_SECRET_KEY="JUNGLERSSPORTS"
+)
+
 
 # HTML 화면 보여주기 
 @app.route('/')
@@ -59,6 +64,21 @@ def delete_count():
     db.mystar.delete_one({"name":name_receive})
     # 3. 성공하면 success 메시지를 반환합니다.
     return jsonify({'result': 'success', 'msg': '삭제 완료! 안녕!'})
+
+@app.route('/signup', methods=['POST'])
+def user_signup() :
+    inputData = request.form
+    userId = inputData['userid']
+    userPw = inputData['password']
+    userName = inputData['username']
+
+    userFound = db.junglers.find_one(userName)
+    if userFound is None :
+        doc = {"userid" : userId, "password" : userPw, "username" : userName}
+        db.junglers.insert_one(doc)
+        return jsonify({"result" : "success", "data" : doc})
+    else :
+        return jsonify({"result" : "이미 가입된 회원입니다."})
 
 
 if __name__ == '__main__':
