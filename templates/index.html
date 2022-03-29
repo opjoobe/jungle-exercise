@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mini Project</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 
 
     <style>
@@ -26,60 +27,75 @@
     </style>
 
     <script>
+        function register(a,b) {
+            $.ajax({
+                type: "POST",
+                url: "/register",
+                dataType: 'json',
+                data: {
+                    time_give: a,
+                    type_give: b,
+                },
+                success: function(response) {
+                    if (response["result"] == "success") {
+                        alert("참가 완료!");
+                        alert(a);
+                        alert(b);
+                        // window.location.reload();
+                    } else {
+                        alert("참가 실패!")
+                    }
+                }
+            })
+        }
     </script>
 
 </head>
 
 <body>
     <div class="wrap pt-5">
-        <div class="buttons is-right pt-3">
-
-            <a class="button is-success" href="login">로그인</a>
-            <a class="button is-light" href="signup">회원가입</a>
-
-
         </div>
+            <div class="wrap pt-5">
+                <div class="buttons is-right pt-3">
+        
+                    <a class="button is-success" href="login">로그인</a>
+                    <a class="button is-light" href="signup">회원가입</a>
+        
+        
+                </div>
+        
+                <div class="has-text-centered pb-6">
+                    <h1 class="title box has-background-success has-text-white">정글 운동 매칭 서비스</h1>
+                </div>
 
-        <div class="has-text-centered pb-6">
-            <h1 class="title box has-background-success has-text-white">정글 운동 매칭 서비스</h1>
+
+            <table class="table center">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>헬스</th>
+                        <th>러닝</th>
+                        <th>산책</th>
+                    </tr>
+                </thead>
+                {% for key, val in homeDict.items()%}
+                <tbody>
+                    <th>{{key}}</th>
+                    {% for status in val %}
+                    <td><button class="button is-white">{{(status["players"]|length)}}명</button><button class="button is-success" onclick="register(key,status['type'])">참가</button></td>
+                    {% endfor %}
+                </tbody>
+                {% endfor %}
+
+            
+            </table>
+
+            <div class="has-text-centered pt-6">
+                <h1 class="title">마감까지 - 시간 - 분 남았습니다.</h1>
+            </div>
+
+            <a href="result.html">결과창</a>
         </div>
-
-
-        <table class="table center">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>헬스</th>
-                    <th>러닝</th>
-                    <th>산책</th>
-                </tr>
-            </thead>
-            <tbody>
-                <th>06:00</th>
-                <td><button class="button is-white">-명</button><button class="button is-success">참가</button></td>
-                <td><button class="button is-white">-명</button><button class="button is-success">참가</button></td>
-                <td><button class="button is-white">-명</button><button class="button is-success">참가</button></td>
-            </tbody>
-            <tbody>
-                <th>07:00</th>
-                <td><button class="button is-white">-명</button><button class="button is-success">참가</button></td>
-                <td><button class="button is-white">-명</button><button class="button is-success">참가</button></td>
-                <td><button class="button is-white">-명</button><button class="button is-success">참가</button></td>
-            </tbody>
-            <tbody>
-                <th>08:00</th>
-                <td><button class="button is-white">-명</button><button class="button is-success">참가</button></td>
-                <td><button class="button is-white">-명</button><button class="button is-success">참가</button></td>
-                <td><button class="button is-white">-명</button><button class="button is-success">참가</button></td>
-            </tbody>
-        </table>
-
-        <div class="has-text-centered pt-6">
-            <h1 class="title">마감까지 - 시간 - 분 남았습니다.</h1>
-        </div>
-
-        <a href="result.html">결과창</a>
-    </div>
 </body>
 
 </html>

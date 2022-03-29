@@ -2,21 +2,50 @@
 
 from pymongo import MongoClient
 from flask import Flask, render_template, jsonify, request
+import itertools
 
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
 db = client.dbjungle
 
+times = ["06:00","07:00","08:00"]
+types = ["헬스", "러닝", "산책"]
+
+print(list(db.service.find({"time":"06:00","type":"러닝"})),"ak")
 
 # HTML 화면 보여주기 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    # for time, type in itertools.product(times, types):
+    #     players = list(db.service.find({"time":time, "type":type}))
+    #     homeList.append({"time":time, "type":type, "players":players})
+    homeDict = dict()
+    for time in times:
+        homeDict[time] = list()
+        for type in types:
+            players = []
+            for player in list(db.service.find({"time":time,"type":type})):
+                players.append(player['name'])
+            homeDict[time].append({"type":type, "players":players})
+    return render_template('index.html', homeDict = homeDict)
 
-@app.route('/result')
-def show_result():
-    return render_template('result.html')
+# @app.route('/mypage')
+# def show_result():
+#     results = list()
+#     res = dict()
+#     for time in times:
+#         res[time] = list()
+#         for type in types:
+#             players = list(db.service.find({"time":time,"type":type}))
+#             res[time].append({"type":type, "players":players})
+#     print(res)
+            
+#     for time, type in itertools.product(times, types):
+#         players = list(db.service.find({"time":time, "type":type}))
+#         results.append({"time":time, "type":type, "players":players})
+#     print(results, "왜안나와")
+#     return render_template('result.html', results=results)
 
 @app.route('/login')
 def show_login():
