@@ -1,7 +1,11 @@
 # 서버부터 만들기
 
+import json
+from wsgiref.util import request_uri
 from pymongo import MongoClient
 from flask import Flask, render_template, jsonify, request
+from flask_jwt_extended import *
+import bcrypt, datetime
 
 app = Flask(__name__)
 
@@ -13,23 +17,51 @@ app.config.update(
     JWT_SECRET_KEY="JUNGLERSSPORTS"
 )
 
+jwt = JWTManager(app)
+jwt_blocklist = set()
+
+@jwt.token_in_blocklist_loader
+def check_if_token_is_revoked(jwt_header, jwt_payload) :
+	jti = jwt_payload['jti']
+	return jti in jwt_blocklist
 
 # HTML 화면 보여주기 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/result')
+@app.route('/mypage')
 def show_result():
-    return render_template('result.html')
+    return render_template('mypage.html')
 
 @app.route('/login')
 def show_login():
     return render_template('login.html')
 
-@app.route('/signup')
-def show_signup():
-    return render_template('signup.html')
+@app.route('/signup', methods=('GET', 'POST'))
+def signup():
+    if request.method == 'GET' :
+        return render_template('signup.html')
+    elif request.method == 'POST' :
+        inputData = request.form
+        
+        userId = inputData['userid']
+        userPw = inputData['password']
+        userName = inputData['username']
+
+        #비밀번호암호화
+        hashedPw = bcrypt.hashpw(userPw.encode('utf-8'), bcrypt.gensalt())
+
+        #정글 a반 인원인지 and 이미가입된 회원은 아닌지 확인 후 등록
+        junglerFound = db.junglers.find_one({"username" : userName}, {'_id': False})
+        userFound = db.user.find_one({"username" : userName}, {'_id': False})
+
+        if (junglerFound is not None and userFound is None) :
+            doc = {"userid" : userId, "password" : hashedPw, "username" : userName}
+            db.user.insert_one(doc)
+            return jsonify({"result" : "success"})
+        else :
+            return jsonify({"result" : "fail"})
 
 # API 역할을 하는 부분
 
@@ -64,21 +96,50 @@ def delete_count():
     db.mystar.delete_one({"name":name_receive})
     # 3. 성공하면 success 메시지를 반환합니다.
     return jsonify({'result': 'success', 'msg': '삭제 완료! 안녕!'})
+    
 
-@app.route('/signup', methods=['POST'])
-def user_signup() :
+#로그인기능
+@app.route('/login', methods=['POST'])
+def user_login() :
     inputData = request.form
     userId = inputData['userid']
     userPw = inputData['password']
-    userName = inputData['username']
+    user = db.user.find_one({'userid': userId}, {'_id': False})
 
-    userFound = db.junglers.find_one(userName)
-    if userFound is None :
-        doc = {"userid" : userId, "password" : userPw, "username" : userName}
-        db.junglers.insert_one(doc)
-        return jsonify({"result" : "success", "data" : doc})
+    access_token = create_access_token(identity=userId, expires_delta= datetime.timedelta(hours=1))
+    print(access_token)
+    #ID/PW유효성확인 후 토큰 return
+    if (userId == user['userid'] and
+            bcrypt.checkpw(userPw.encode('utf-8'), user['password'])):
+        return jsonify(
+            {"result": "success",
+            "token": access_token
+            }
+        )
+    else:
+        return jsonify({
+            "result": "fail", 
+            "msg": "유효하지 않은 id, pw 입니다."
+        }
+        )
+
+@app.route('/logout', methods=['POST'])
+@jwt_required()
+def user_logout() :
+    jti = get_jwt()['jti']
+    jwt_blocklist.add(jti)
+    return jsonify({"result": "success", "msg": "로그아웃 완료"}) #index로 redirect해줘야하나?
+
+
+@app.route('/register', methods=['POST'])
+@jwt_required()
+def register() :
+    user = get_jwt_identity()
+    if user is None :
+        return jsonify({"result": "forbidden", "msg": "로그인 해주세요!"})
     else :
-        return jsonify({"result" : "이미 가입된 회원입니다."})
+        return user
+
 
 
 if __name__ == '__main__':
