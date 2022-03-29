@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mini Project</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 </head>
 
 <style>
@@ -15,6 +16,32 @@
     }
 </style>
 
+<script>
+    function signup() {
+        let userid = $("#input-userid").val()
+        let password = $("#input-password").val()
+        let username = $("#input-username").val()
+        $.ajax({
+            type: "POST",
+            url: "/signup",
+            dataType: 'json',
+            data: {
+                userid: userid,
+                password: password,
+                username: username
+            },
+
+            success: function(response) {
+                if (response["result"] == "success") {
+                    alert("회원가입 성공!");
+                    location.href = "/";
+                } else {
+                    alert("회원가입 실패!")
+                }
+            }
+        })
+    }
+</script>
 
 <body>
 
@@ -22,33 +49,33 @@
     <div class="wrap pt-6">
 
         <div class=" box has-background-success  has-text-centered mt-6 mb-6">
-            <a href="index.html" class="title has-text-white">정글 운동 매칭 서비스</a>
+            <a href="index" class="title has-text-white">정글 운동 매칭 서비스</a>
         </div>
 
-        <form class="box">
+        <div class="box">
             <div class="field">
                 <label class="label">아이디</label>
                 <div class="control">
-                    <input class="input" type="text" placeholder="아이디를 입력하세요">
+                    <input class="input" id="input-userid" type="text" placeholder="아이디를 입력하세요">
                 </div>
             </div>
 
             <div class="field">
                 <label class="label">비밀번호</label>
                 <div class="control">
-                    <input class="input" type="password" placeholder="비밀번호를 입력하세요">
+                    <input class="input" id="input-password" type="password" placeholder="비밀번호를 입력하세요">
                 </div>
             </div>
 
             <div class="field">
                 <label class="label">이름</label>
                 <div class="control">
-                    <input class="input" type="text" placeholder="이름을 입력하세요">
+                    <input class="input" id="input-username" type="text" placeholder="이름을 입력하세요">
                 </div>
             </div>
 
-            <button class="button is-success">회원가입</button>
-        </form>
+            <button class="button is-success" onclick="signup()">회원가입</button>
+        </div>
     </div>
 </body>
 

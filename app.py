@@ -15,6 +15,8 @@ db = client.dbjungle
 times = ["06:00","07:00","08:00"]
 types = ["헬스", "러닝", "산책"]
 
+#JWT 매니저 활성화
+
 app.config.update(
     DEBUG=True,
     JWT_SECRET_KEY="JUNGLERSSPORTS"
@@ -36,8 +38,8 @@ def home():
         homeDict[time] = list()
         for type in types:
             players = []
-            for player in list(db.service.find({"time":time,"type":type})):
-                players.append(player['name'])
+            for player in list(db.user.find({"time":time,"type":type})):
+                players.append(player['username'])
             homeDict[time].append({"type":type, "players":players})
         print(homeDict)
     return render_template('index.html', homeDict = homeDict)
@@ -116,17 +118,33 @@ def user_logout() :
     return jsonify({"result": "success", "msg": "로그아웃 완료"}) #index로 redirect해줘야하나?
 
 #운동등록기능
+# @app.route('/register', methods=['POST'])
+# def register():
+#     time_receive = request.form['time_give'] # 1. 클라이언트가 전달한 time_give 변수를 time_receive 변수에 넣음
+#     type_receive = request.form['type_give'] # 2. 클라이언트가 전달한 type_give 변수를 type_receive 변수에 넣음
+#     # userid = 
+#     # 해당 로그인 사용자의 db를 업데이트 시켜줌. 
+#     # db.service.update_one({'userid':userid},{'$set':{"time":time_receive,"type":type_receive}})
+#     #db.service.insert_one({'name':'김소정', 'time':time_receive, 'type':type_receive})
+#     # 2. 성공하면 success 메시지와 함께 counts 라는 운동 인원 수를 클라이언트에 전달합니다.
+#     return jsonify({'result': 'success', 'msg':'참가 완료!'})
+
 @app.route('/register', methods=['POST'])
+
 @jwt_required()
 def register() :
+    print("user 가져옵시다")
     user = get_jwt_identity()
+    print("user 가져왔음?", user)
     if user is None :
+        print("user는 없다")
         return jsonify({"result": "forbidden", "msg": "로그인 해주세요!"})
     else :
+        print("else문 실행")
         time_receive = request.form['time_give'] # 1. 클라이언트가 전달한 time_give 변수를 time_receive 변수에 넣음
         type_receive = request.form['type_give'] # 2. 클라이언트가 전달한 type_give 변수를 type_receive 변수에 넣음
         print("case1")
-        db.service.update_one({'userid':user},{'$set':{"time":time_receive,"type":type_receive}})
+        db.user.update_one({'userid':user},{'$set':{"time":time_receive,"type":type_receive}})
         print("case2")
         # 2. 성공하면 success 메시지와 함께 counts 라는 운동 인원 수를 클라이언트에 전달합니다.
         return jsonify({'result': 'success', 'msg':'참가 완료!'})

@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mini Project</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 
 
     <style>
@@ -14,12 +15,12 @@
             margin: auto;
             width: 1000px
         }
-        
+
         table {
             width: 800px;
             height: 300px;
         }
-        
+
         table.center {
             margin-left: auto;
             margin-right: auto;
@@ -27,73 +28,168 @@
     </style>
 
     <script>
-        function register(a,b) {
+        function register(a, b) {
             $.ajax({
                 type: "POST",
                 url: "/register",
                 dataType: 'json',
+                headers: {
+                    "Authorization": 'Bearer ' + localStorage.getItem('token')
+                },
                 data: {
                     time_give: a,
                     type_give: b,
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response["result"] == "success") {
-                        //alert("참가 완료!");
                         alert(response['msg']);
                         window.location.reload();
                     } else {
-                        alert("참가 실패!")
+                        alert("참가 실패!");
                     }
                 }
             })
         }
+        function logout() {
+            $.ajax({
+                type: 'GET',
+                url: "/logout",
+                headers: {
+                    "Authorization": 'Bearer ' + localStorage.getItem('token')
+                },
+                success: function(response) {
+                    if (response["result"] == "success") {
+                        alert("로그아웃 완료!");
+                        window.location.reload();
+                    } else {
+                        alert("로그아웃 실패!")
+                    }
+                }
+            })
+        }
+        function remaindTime() {
+            var now = new Date();
+            var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 24, 00, 00);
+            var open = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 06, 00, 00);
+
+            var nt = now.getTime();
+            var ot = open.getTime();
+            var et = end.getTime();
+
+            if (nt < ot) {
+                $(".time").fadeIn();
+                $("p.time-title").html("신청 시작까지 남은 시간");
+                sec = parseInt(ot - nt) / 1000;
+                day = parseInt(sec / 60 / 60 / 24);
+                sec = (sec - (day * 60 * 60 * 24));
+                hour = parseInt(sec / 60 / 60);
+                sec = (sec - (hour * 60 * 60));
+                min = parseInt(sec / 60);
+                sec = parseInt(sec - (min * 60));
+                if (hour < 10) {
+                    hour = "0" + hour;
+                }
+                if (min < 10) {
+                    min = "0" + min;
+                }
+                if (sec < 10) {
+                    sec = "0" + sec;
+                }
+                $(".hours").html(hour);
+                $(".minutes").html(min);
+                $(".seconds").html(sec);
+            } else if (nt > et) {
+                $("p.time-title").html("<a href='mypage'>매칭 결과 보기</a>");
+                $(".time").fadeOut();
+            } else {
+                $(".time").fadeIn();
+                $("p.time-title").html("신청 마감까지 남은 시간");
+                sec = parseInt(et - nt) / 1000;
+                day = parseInt(sec / 60 / 60 / 24);
+                sec = (sec - (day * 60 * 60 * 24));
+                hour = parseInt(sec / 60 / 60);
+                sec = (sec - (hour * 60 * 60));
+                min = parseInt(sec / 60);
+                sec = parseInt(sec - (min * 60));
+                if (hour < 10) {
+                    hour = "0" + hour;
+                }
+                if (min < 10) {
+                    min = "0" + min;
+                }
+                if (sec < 10) {
+                    sec = "0" + sec;
+                }
+                $(".hours").html(hour);
+                $(".minutes").html(min);
+                $(".seconds").html(sec);
+            }
+        }
+        setInterval(remaindTime, 1000);
+        // function time() {
+        //     let today = new Date();
+
+        //     let hours = today.getHours();
+
+        //     let minutes = today.getMinutes();
+
+        //     let seconds = today.getSeconds();
+
+        //     console.log(hours + ':' + minutes + ':' + seconds)
+        // }
     </script>
 
 </head>
 
 <body>
     <div class="wrap pt-5">
+        {% if 1 %}
+        <div class="buttons is-right pt-3">
+            <a class="button is-success" href="login">로그인</a>
+            <a class="button is-light" href="signup">회원가입</a>
         </div>
-            <div class="wrap pt-5">
-                <div class="buttons is-right pt-3">
-        
-                    <a class="button is-success" href="login">로그인</a>
-                    <a class="button is-light" href="signup">회원가입</a>
-        
-        
-                </div>
-        
-                <div class="has-text-centered pb-6">
-                    <h1 class="title box has-background-success has-text-white">정글 운동 매칭 서비스</h1>
-                </div>
+        {% else %}
+        <div class="buttons is-right pt-3">
+            {{username}}님 환영합니다.
+            <button class="button is-success ml-3" onclick="logout()">로그아웃</button>
+        </div>
+        {% endif %}
+        <div class="has-text-centered pb-6">
+            <h1 class="title box has-background-success has-text-white">정글 운동 매칭 서비스</h1>
+        </div>
 
-
-            <table class="table center">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>헬스</th>
-                        <th>러닝</th>
-                        <th>산책</th>
-                    </tr>
-                </thead>
-                {% for key, val in homeDict.items()%}
-                <tbody>
-                    <th>{{key}}</th>
-                    {% for status in val %}
-                    <td><button class="button is-white">{{(status["players"]|length)}}명</button><button class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button></td>
-                    {% endfor %}
-                </tbody>
+        <table class="table center">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>헬스</th>
+                    <th>러닝</th>
+                    <th>산책</th>
+                </tr>
+            </thead>
+            {% for key, val in homeDict.items()%}
+            <tbody>
+                <th>{{key}}</th>
+                {% for status in val %}
+                <td><button class="button is-white">{{(status["players"]|length)}}명</button><button
+                        class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button>
+                </td>
                 {% endfor %}
+            </tbody>
+            {% endfor %}
+        </table>
 
-            </table>
-
-            <div class="has-text-centered pt-6">
-                <h1 class="title">마감까지 - 시간 - 분 남았습니다.</h1>
+        <div class="is-centered">
+            <p class="time-title">신청 마감까지 남은 시간</p>
+            <div class="time">
+                <span class="hours"></span>
+                <span class="col">:</span>
+                <span class="minutes"></span>
+                <span class="col">:</span>
+                <span class="seconds"></span>
             </div>
-
-            <a href="mypage">결과창</a>
         </div>
+    </div>
 </body>
 
 </html>
