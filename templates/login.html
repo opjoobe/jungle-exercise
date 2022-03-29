@@ -13,6 +13,7 @@
       integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
       crossorigin="anonymous"
     ></script>
+    <script src="../static/jquery.cookie.js"></script>
   </head>
 
   <style>
@@ -38,6 +39,10 @@
         success: function (response) {
           if (response["result"] == "success") {
             alert("로그인 성공!");
+            $.cookie("jwt-token", response["token"], {
+              expires: 1,
+              path: "/",
+            });
             location.href = "/";
           } else {
             alert("로그인 실패!");
