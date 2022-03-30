@@ -30,6 +30,11 @@
         margin-left: auto;
         margin-right: auto;
       }
+
+      img{
+        width: auto;
+        height: 300px;
+      }
     </style>
     <script>
       function logout() {
@@ -49,6 +54,12 @@
           },
         });
       }
+
+      var imgurl="/static/images/" + '{{result["type"]}}' + ".png";
+      window.onload = function(){
+        document.getElementById("imageid").src = imgurl;
+      }
+
     </script>
   </head>
 
@@ -74,15 +85,52 @@
         </h1>
       </div>
 
-      <div class="has-text-centered pt-6">
+      <div class="has-text-centered">
         <h1 class="title">매칭 결과</h1>
       </div>
 
       {% if (result['players']|length)>=2 %}
-      <button class="button is-white">
-        {{ result['time'] }} {{result["type"]}}{{result["players"]}}
-      </button>
+
+      {% set _dummy=result['players'].remove(username) %}
+
+      <div class="has-text-centered pt-6">
+        <!-- <p class="title pb-5">{{username}}님</p>  -->
+        <p class="subtitle">{% for player in result['players'][:-1]%} 
+          <strong>{{player}}</strong>님,
+          {% endfor %} 
+          <strong>{{result['players'][-1]}}</strong>님과 함께 <strong>{{result["type"]}}</strong>입니다.</p>
+        <p class="subtitle">시간 : 아침 <strong>{{result['time'].split(':')[0][1]}}</strong>시</p>
+        <p class="subtitle">장소 : {%if (result["type"] == 헬스)%} 강의동 지하 1층 헬스장 {%else%} 기숙사 앞{%endif%}</p>
+        <img id="imageid" src="">
+      </div>
+      {%else%}
+      <div class="has-text-centered pt-6">
+        <!-- <p class="title pb-5">{{username}}님</p>  -->
+        <p class="subtitle">인원 미달로 매칭이 성사되지 않았습니다.</p>
+        <img src="/static/images/fail.png">
       {% endif %}
+
     </div>
+    <p>{{userlog}}</p>
+
+
+{% set h_list = [] %}
+{% set w_list = [] %}
+{% set r_list = [] %}
+
+{% for k, v in userlog.items() %}
+{%if v == '헬스' %}
+{{h_list.append(k)}}
+{% elif v == '산책' %}
+{{w_list.append(k)}}
+{% else %}
+{{r_list.append(k)}}
+{% endif %}
+{% endfor %}
+<p class="title">운동 기록</p>
+<p>헬스 횟수 : {{h_list|length}}, 운동한 날 : {% for day in h_list %}<span>{{day[:2]}}월{{day[2:]}}일   </span>{%endfor%}</p>
+<p>산책 횟수 : {{w_list|length}}, 운동한 날 : {% for day in w_list %}<span>{{day[:2]}}월{{day[2:]}}일   </span>{%endfor%}</p>
+<p>러닝 횟수 : {{r_list|length}}, 운동한 날 : {% for day in r_list %}<span>{{day[:2]}}월{{day[2:]}}일   </span>{%endfor%}</p>
+
   </body>
 </html>
