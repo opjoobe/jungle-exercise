@@ -11,3 +11,4 @@ class Init_Jungler_DB:
                 "배동준", "이동희", "한승희", "강찬익", "김민우", "석혜린", "김민성", "김현진", "왕경업", "강세훈", "이기성", "박윤찬", "이승원"]
         for jungler in junglerList:
             db.junglers.insert_one({'username':jungler})
+
