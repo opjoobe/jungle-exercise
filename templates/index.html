@@ -119,14 +119,36 @@
 
         }
         setInterval(remaindTime, 1000);
+
+        $(document).ready(function(){
+            $.ajax({
+                url: 'https://api.openweathermap.org/data/2.5/weather?qSeoul&appid=f9d7a0fd2d6d72ccdcbd7efab92469e6&units=metric',
+                dataType: 'json',
+                type: 'GET',
+                success: function(data){
+                    var $Icon = (data.weather[0].icon);
+                    var $Temp = Math.floor(data.main.temp) + '도';
+                    var $city = data.name;
+
+                     $('.CurrIcon').append('http://openweathermap.org/img/wn/' + $Icon + '@2x.png');
+                     $('.CurrTemp').prepend($Temp);
+                     $('.City').append($city);
+                }
+            })
+        });
     </script>
 
 </head>
 
 <body>
+
     <div class="wrap pt-5">
-    </div>
-    <div class="wrap pt-5">
+        <div class="weather">
+            <div class="CurrIcon"></div>
+            <div class="CurrTemp"></div>
+            <div class="City"></div>
+        </div>
+        
         {% if loginChecked %}
         <div class="buttons is-right pt-3">
             <a class="button is-success" href="login">로그인</a>
@@ -159,7 +181,7 @@
                 <th>{{key}}</th>
                 {% for status in val %}
                 <td><button class="button is-white">{{(status["players"]|length)}}명</button>
-                    <button class="button is-success" onclick="register('{{key}}', '{{(status[" type "])}}')">참가</button>
+                    <button class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button>
                 </td>
                 {% endfor %}
             </tbody>
@@ -181,6 +203,7 @@
             <p class="time_text subtitle pt-3">매칭 결과를 보려면 로그인 하세요</p> {% endif %}
         </div>
 
+        <a href="mypage">결과창</a>
     </div>
 </body>
 
