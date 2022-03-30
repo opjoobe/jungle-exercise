@@ -65,7 +65,7 @@ def show_signup():
 
 ### APSCHEDULER 3 ###
 
-#@app.route('/kill', methods=["POST"])
+@app.route('/kill', methods=["POST"])
 def show_reset():
     with app.app_context():
         time_L = list(db.user.find({"time" : {'$exists':True}}))
@@ -76,10 +76,10 @@ def show_reset():
             return jsonify({"result":"등록한 사람이 없습니다."})
 
 #apscheduler 선언
-sched = BackgroundScheduler(daemon=True)
+sched = BackgroundScheduler(daemon=True, timezone='Asia/Seoul')
 
 #apscheduler 실행설정, Cron 방식으로, 1~53주간 실행, 월~일 실행, 8시 59분 55초 실행, hour='8', minute='59', second ='55'
-sched.add_job(show_reset, 'cron', week='1-53', day_of_week='0-6', second ='55')
+sched.add_job(show_reset, 'cron', week='1-53', day_of_week='0-6', hour = '10', minute ='9', second = '30')
 
 #apscheduler 실행
 sched.start()

@@ -31,3 +31,5 @@ else:
         print("time 없음")
 if B:
         print("B 있음")
+
+db.user.drop()
