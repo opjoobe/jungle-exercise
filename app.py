@@ -11,6 +11,9 @@ from flask_jwt_extended.config import config
 from jwt.exceptions import (
     ExpiredSignatureError
 )
+
+# 부가기능
+from init_db import Init_db
  
 #APSCHEDULER 1
 import time
@@ -147,12 +150,21 @@ def signup():
     junglerFound = db.junglers.find_one({"username" : userName}, {'_id': False})
     userFound = db.user.find_one({"username" : userName}, {'_id': False})
 
-    if (junglerFound is not None and userFound is None) :
+    if (junglerFound is None) :
+        return jsonify({
+                "result" : "fail",
+                "msg": "정글 4기 A반만 가입하실 수 있습니다."
+                })
+    elif (userFound is not None) :
+        return jsonify({
+            "result" : "fail",
+            "msg": "이미 가입된 회원입니다."
+            })
+    else :
         doc = {"userid" : userId, "password" : hashedPw, "username" : userName}
         db.user.insert_one(doc)
         return jsonify({"result" : "success"})
-    else :
-        return jsonify({"result" : "fail"})
+        
 
 
 #로그인기능
@@ -163,22 +175,26 @@ def user_login() :
     userPw = inputData['password']
     user = db.user.find_one({'userid': userId}, {'_id': False})
 
-    access_token = create_access_token(identity=userId, expires_delta= datetime.timedelta(hours=1))
-    print(access_token)
-    #ID/PW유효성확인 후 토큰 return
-    if (userId == user['userid'] and
-            bcrypt.checkpw(userPw.encode('utf-8'), user['password'])):
-        return jsonify(
-            {"result": "success",
-            "token": access_token
+    if user is not None :
+        #ID/PW유효성확인 후 토큰 return
+        if (userId == user['userid'] and
+                bcrypt.checkpw(userPw.encode('utf-8'), user['password'])):
+            return jsonify(
+                {"result": "success",
+                "token": create_access_token(identity=userId, expires_delta= datetime.timedelta(hours=1))
+                }
+            )
+        else:
+            return jsonify({
+                "result": "fail", 
+                "msg": "틀린 아이디이거나 비밀번호입니다. 다시 확인해주세요."
             }
-        )
-    else:
+            )
+    else :
         return jsonify({
-            "result": "fail", 
-            "msg": "유효하지 않은 id, pw 입니다."
-        }
-        )
+            "result": "fail",
+            "msg": "가입되지 않은 회원입니다. 가입 후 이용해주세요."
+        })
 
 #로그아웃기능
 @app.route('/logout', methods=['GET'])
@@ -206,4 +222,5 @@ def register() :
         return jsonify({'result': 'success', 'msg':'참가 완료!'})
 
 if __name__ == '__main__':
+    Init_db.insert_all()
     app.run('0.0.0.0', port=5000, debug=True)
