@@ -29,6 +29,7 @@
         .time_text {
             display: none;
         }
+
     </style>
 
     <script>
@@ -182,6 +183,7 @@
                 {% for status in val %}
                 <td><button class="button is-white">{{(status["players"]|length)}}명</button>
                     <button class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button>
+                    <progress class="progress is-small mt-2 is-info" value="{{(status["players"]|length)}}" max="8">20%</progress>
                 </td>
                 {% endfor %}
             </tbody>
