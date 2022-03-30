@@ -24,8 +24,16 @@ app.config.update(
     JWT_TOKEN_LOCATION=["headers", "cookies"]
 )
 
+#Main page 구성 위한 초기 세팅
 times = ["06:00","07:00","08:00"]
 types = ["헬스", "러닝", "산책"]
+
+#코멘트 등록 위한 임시 userId 저장
+class tempUser :
+    id = ""
+    @staticmethod
+    def setUser(userId):
+        tempUser.id = userId
 
 #JWT 매니저 활성화
 jwt = JWTManager(app)
@@ -82,11 +90,15 @@ def show_mypage():
     else:
         registeredType = loginUser['type']
         registeredTime = loginUser['time']
-        dataAll = db.user.find({},{'_id':False, 'username': 1, 'log': 1})
+        dataAll = list(db.user.find({},{'_id':False, 'username': True, 'log': True}))
 
         players = []
         for player in list(db.user.find({"time":registeredTime,"type":registeredType})):
             players.append(player['username'])
+
+        # 같은 운동 및 시간 신청한 사람들의 이름과 코멘트 전달
+        # Client에서 players로 받던 데이타 for문으로 변경 필요함
+        # players = db.user.find({"time":registeredTime,"type":registeredType},{"_id":False,"username":True,"comment":True})
         result = {"type" : registeredType, "time" : registeredTime, "players" : players}
         
         return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result, userlog = loginUser['log'], all = dataAll)
@@ -188,7 +200,31 @@ def doRegister(inputData) :
         type_receive = inputData['type_give'] # 2. 클라이언트가 전달한 type_give 변수를 type_receive 변수에 넣음
         db.user.update_one({'userid':user},{'$set':{"time":time_receive,"type":type_receive}})
         # 2. 성공하면 success 메시지와 함께 counts 라는 운동 인원 수를 클라이언트에 전달합니다.
-    return jsonify({'result': 'success', 'msg':'참가 완료!'})
+        print(user)
+        tempUser.id = user
+        print(tempUser.id)
+        return jsonify({'result': 'success', 'msg':'참가 완료!'})
+
+
+@app.route('/register/comment', methods=['POST'])
+def registerCmt() :
+    inputData = request.form
+    cmt = inputData['comment'].strip()
+
+    if (cmt == "") :
+        return jsonify({
+            "result" : "fail",
+            "msg" : "코멘트를 입력해주세요"
+        })
+    else :
+        print(tempUser.id)
+        print(db.user.find_one({'userid':tempUser.id}))
+        db.user.update_one({'userid':tempUser.id},{'$set':{"comment": cmt}})
+        return jsonify({
+            "result" : "success",
+            "msg" : "코멘트 저장 완료"
+        })
+
 
 
 if __name__ == '__main__':

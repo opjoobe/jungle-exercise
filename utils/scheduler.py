@@ -45,7 +45,8 @@ def show_reset():
                 print("player {} 총 운동 횟수: {}회 - 운동한 날: {}".format(user_name, len(player['log']), list(player['log'].keys())))
                 '''
             # 이렇게 for문을 다 돌려서 log를 업데이트 해줬으면, time과 type 필드를 제거해줌. 초기화 완료!
-            db.user.update_many({},{'$unset':{'time':True, 'type':True}})
+            # comment도 지우도록 추가
+            db.user.update_many({},{'$unset':{'time':True, 'type':True, 'comment':True}})
             return jsonify({"result":"초기화 완료"})
         else:
             return jsonify({"result":"등록한 사람이 없습니다."})
