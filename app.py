@@ -47,8 +47,36 @@ def check_if_token_is_revoked(jwt_header, jwt_payload) :
 @app.route('/kill', methods=["POST"])
 def show_reset():
     with app.app_context():
-        time_L = list(db.user.find({"time" : {'$exists':True}}))
-        if time_L:
+        players = list(db.user.find({"time" : {'$exists':True}}))
+        if players:
+            for player in players:
+                user_name = player['username']
+                # 현재는 더 많은 데이터를 뽑아 테스트하기 위해 시-분-초까지 나오게 했고, 최종 버전에서는 "%Y%m%d"로 수정하여야 함.
+                # 데이터 뽑히게 하려면, 하단의 line 89 sched.add_job의 시간대를 변경해가며 py를 다시 실행하면 될거 같습니다!
+                # 5시로 설정해 실행한 다음, 5시가 지나면 5시 10분으로 설정해 재실행, 이후 5시 10분이 지나면.....  
+
+                player['log'][datetime.datetime.today().strftime("%Y%m%d%H%M%S")] = player['type'] # 운동날짜를 key로, 운동종류를 value로 log사전에 저장
+                db.user.update_one({'username':user_name}, {'$set':{'log':player['log']}}) # 위를 반영해 log 사전을 update 해줌
+                
+                # 파이썬 상에서 원하는 데이터 뽑는 예시입니다. jinja2 짤 때 참고하시라고 같이 첨부해드립니다!
+                '''
+                h_list = [] #헬스 리스트
+                s_list = [] #산책 리스트
+                r_list = [] #러닝 리스트
+                # log를 보고, 헬스, 산책, 러닝을 한 각각의 날짜를 각 리스트로 추출
+                for k, v in player['log'].items():
+                    if v == '헬스':
+                        h_list.append(k)
+                    elif v == '산책':
+                        s_list.append(k)
+                    else:
+                        r_list.append(k)
+                print("player {} 헬스 횟수: {}회 - 운동한 날: {}".format(user_name, len(h_list), h_list))
+                print("player {} 산책 횟수: {}회 - 운동한 날: {}".format(user_name, len(s_list), s_list))
+                print("player {} 러닝 횟수: {}회 - 운동한 날: {}".format(user_name, len(r_list), r_list))
+                print("player {} 총 운동 횟수: {}회 - 운동한 날: {}".format(user_name, len(player['log']), list(player['log'].keys())))
+                '''
+            # 이렇게 for문을 다 돌려서 log를 업데이트 해줬으면, time과 type 필드를 제거해줌. 초기화 완료!
             db.user.update_many({},{'$unset':{'time':True, 'type':True}})
             return jsonify({"result":"초기화 완료"})
         else:
@@ -57,8 +85,11 @@ def show_reset():
 #apscheduler 선언
 sched = BackgroundScheduler(daemon=True, timezone="Asia/Seoul")
 
+
+
 #apscheduler 실행설정, Cron 방식으로, 1~53주간 실행, 월~일 실행, 8시 59분 55초 실행, hour='8', minute='59', second ='55'
 sched.add_job(show_reset, 'cron', week='1-53', day_of_week='0-6', hour='8', minute='59', second ='55')
+
 
 #apscheduler 실행
 sched.start()
@@ -147,8 +178,9 @@ def signup():
     junglerFound = db.junglers.find_one({"username" : userName}, {'_id': False})
     userFound = db.user.find_one({"username" : userName}, {'_id': False})
 
+    ### db에 'log' 추가
     if (junglerFound is not None and userFound is None) :
-        doc = {"userid" : userId, "password" : hashedPw, "username" : userName}
+        doc = {"userid" : userId, "password" : hashedPw, "username" : userName, "log" : dict()}       
         db.user.insert_one(doc)
         return jsonify({"result" : "success"})
     else :
@@ -192,6 +224,7 @@ def user_logout() :
 @app.route('/register', methods=['POST'])
 @jwt_required()
 def register() :
+    print("register 작업 시작")
     user = get_jwt_identity()
     
     if user is None :
@@ -199,9 +232,7 @@ def register() :
     else :
         time_receive = request.form['time_give'] # 1. 클라이언트가 전달한 time_give 변수를 time_receive 변수에 넣음
         type_receive = request.form['type_give'] # 2. 클라이언트가 전달한 type_give 변수를 type_receive 변수에 넣음
-        print("case1")
         db.user.update_one({'userid':user},{'$set':{"time":time_receive,"type":type_receive}})
-        print("case2")
         # 2. 성공하면 success 메시지와 함께 counts 라는 운동 인원 수를 클라이언트에 전달합니다.
         return jsonify({'result': 'success', 'msg':'참가 완료!'})
 

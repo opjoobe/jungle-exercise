@@ -40,7 +40,15 @@
                   time_give: a,
                   type_give: b,
               },
+              error: function(xhr, textStatus, errorThrown){
+                  if (xhr.status == 401){
+                      console.log("401에러 반화아안");
+                      alert("참가 실패! 로그인 하세요!");
+                      window.location.reload();
+                  }
+              },
               success: function(response) {
+                  console.log("response 왔는강")
                   if (response["result"] == "success") {
                       alert("참가 완료!");
                       window.location.reload();
