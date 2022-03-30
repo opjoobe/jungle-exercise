@@ -15,6 +15,7 @@ a = db.user.find_one({"username":'이주형'})
 b = a['log']
 
 print(b['헬스'])
+print(a)
 
 # db.user.update_many({},{'$unset':{'time':True, 'type':True}})
 # db.user.insert_one({"username":이주형},{})
