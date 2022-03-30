@@ -1,46 +1,89 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Mini Project</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-</head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.js"
+      integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+      crossorigin="anonymous"
+    ></script>
+    <script src="../static/jquery.cookie.js"></script>
+  </head>
 
-<style>
+  <style>
     .wrap {
-        margin: auto;
-        width: 500px
+      margin: auto;
+      width: 500px;
     }
-</style>
+  </style>
 
+  <script>
+    function login() {
+      let userid = $("#input-userid").val();
+      let password = $("#input-password").val();
+      $.ajax({
+        type: "POST",
+        url: "/login",
+        dataType: "json",
+        data: {
+          userid: userid,
+          password: password,
+        },
 
-<body>
+        success: function (response) {
+          if (response["result"] == "success") {
+            alert("로그인 성공!");
+            $.cookie("jwt-token", response["token"], {
+              expires: 1,
+              path: "/",
+            });
+            location.href = "/";
+          } else {
+            alert("로그인 실패!");
+          }
+        },
+      });
+    }
+  </script>
+
+  <body>
     <div class="wrap pt-6">
-
-
-        <div class=" box has-background-success  has-text-centered mt-6 mb-6">
-            <a href="index.html" class="title has-text-white">정글 운동 매칭 서비스</a>
+      <div class="box has-background-success has-text-centered mt-6 mb-6">
+        <a href="/" class="title has-text-white">정글 운동 매칭 서비스</a>
+      </div>
+      <div class="box">
+        <div class="field">
+          <label class="label">아이디</label>
+          <div class="control">
+            <input
+              id="input-userid"
+              class="input"
+              type="text"
+              placeholder="아이디를 입력하세요"
+            />
+          </div>
         </div>
-        <form class="box ">
-            <div class="field">
-                <label class="label">아이디</label>
-                <div class="control">
-                    <input class="input" type="text" placeholder="아이디를 입력하세요">
-                </div>
-            </div>
 
-            <div class="field">
-                <label class="label">비밀번호</label>
-                <div class="control">
-                    <input class="input" type="password" placeholder="비밀번호를 입력하세요">
-                </div>
-            </div>
+        <div class="field">
+          <label class="label">비밀번호</label>
+          <div class="control">
+            <input
+              id="input-password"
+              class="input"
+              type="password"
+              placeholder="비밀번호를 입력하세요"
+            />
+          </div>
+        </div>
 
-            <button class="button is-success">로그인</button>
-        </form>
+        <button class="button is-success" onclick="login()">로그인</button>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>
