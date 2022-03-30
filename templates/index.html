@@ -73,7 +73,11 @@
                 <th>{{key}}</th>
                 {% for status in val %}
                 <td><button class="button is-white">{{(status["players"]|length)}}명</button>
+                    {% if (status["players"]|length) < 8 %}
                     <button class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button>
+                    {% else %}
+                    <button class="button is-success" onclick="expired()">만료</button>
+                    {% endif %}
                     <progress class="progress is-small mt-2 is-info" value="{{(status["players"]|length)}}" max="8">20%</progress>
                 </td>
                 {% endfor %}

@@ -27,6 +27,8 @@ function register(a, b) {
     })
 }
 
+expired = () => alert("정원 초과입니다.")
+
 function registerCmt(existCmt = true) {
   let cmt = ""
   if (existCmt) {
