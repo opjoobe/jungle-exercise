@@ -35,8 +35,12 @@
 
 <body>
     <div class="wrap pt-5">
-    </div>
-    <div class="wrap pt-5">
+        <div class="weather">
+            <div class="CurrIcon"></div>
+            <div class="CurrTemp"></div>
+            <div class="City"></div>
+        </div>
+
         {% if loginChecked %}
         <div class="buttons is-right pt-3">
             <a class="button is-success" href="login">로그인</a>
@@ -70,6 +74,7 @@
                 {% for status in val %}
                 <td><button class="button is-white">{{(status["players"]|length)}}명</button>
                     <button class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button>
+                    <progress class="progress is-small mt-2 is-info" value="{{(status["players"]|length)}}" max="8">20%</progress>
                 </td>
                 {% endfor %}
             </tbody>
@@ -98,7 +103,7 @@
                 <div class="box">
                     <p><h1>각오 한마디 해주세요!</h1></p>
                     <textarea id="cmt" class="textarea" placeholder="같이 운동해요!!!"></textarea>
-                    <button class="button is-success" onclick="registerCmt()">저장</button>
+                    <button class="button is-success" onclick="registerCmt()">등록</button>
                 </div>
             </div>
             <button class="modal-close is-large" aria-label="close"></button>

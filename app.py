@@ -83,25 +83,32 @@ def show_mypage():
     
     loginChecked = jti in jwt_blocklist
     
+    # 전달해줄 count_data 생성 #########################
+    count_data = list(db.user_rank.find({},{"_id":False, "username":1, "total_count" : 1, "health_count" : 1, "walking_count" : 1, "running_count" : 1}))
+
     loginUser = db.user.find_one({"userid": user})
     if (not ("type" in loginUser) or not ("time" in loginUser)) :
         result = "신청한 운동이 없습니다."
-        return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result)
+        return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result, userlog=loginUser['log'], count_data = count_data)
     else:
         registeredType = loginUser['type']
         registeredTime = loginUser['time']
-        dataAll = list(db.user.find({},{'_id':False, 'username': True, 'log': True}))
-
+    
+    ####################################################
         players = []
         for player in list(db.user.find({"time":registeredTime,"type":registeredType})):
             players.append(player['username'])
 
-        # 같은 운동 및 시간 신청한 사람들의 이름과 코멘트 전달
+        # 같은 운동 및 시간 신청한 사람들의 이름과 코멘트 전달      
         # Client에서 players로 받던 데이타 for문으로 변경 필요함
         # players = db.user.find({"time":registeredTime,"type":registeredType},{"_id":False,"username":True,"comment":True})
         result = {"type" : registeredType, "time" : registeredTime, "players" : players}
+
+    # count_data 추가로 전달 ############################
+        return render_template('mypage.html', loginChecked = loginChecked, username = loginUser['username'], result = result, userlog=loginUser['log'], count_data = count_data)
+    ####################################################
+
         
-        return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result, userlog = loginUser['log'], all = dataAll)
 
 @app.route('/login')
 def show_login():
@@ -140,8 +147,13 @@ def signup():
             "msg": "이미 가입된 회원입니다."
             })
     else :
+        # db에 rank 추가 ##################################
+        rank = {"userid" : userId, "username" : userName,  "total_count" : 0, "health_count" : 0, "walking_count" : 0, "running_count" : 0}
+        db.user_rank.insert_one(rank)
+        ###################################################
         doc = {"userid" : userId, "password" : hashedPw, "username" : userName, "log" : dict()}       
         db.user.insert_one(doc)
+
         return jsonify({"result" : "success"})
         
 
@@ -205,7 +217,7 @@ def doRegister(inputData) :
         print(tempUser.id)
         return jsonify({'result': 'success', 'msg':'참가 완료!'})
 
-
+#운동각오코멘트등록기능
 @app.route('/register/comment', methods=['POST'])
 def registerCmt() :
     inputData = request.form
@@ -228,5 +240,4 @@ def registerCmt() :
 
 
 if __name__ == '__main__':
-    Init_Jungler_DB.insert_all()
     app.run('0.0.0.0', port=5000, debug=True)
