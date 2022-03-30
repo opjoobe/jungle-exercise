@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="../static/jquery.cookie.js"></script>
+    <script src="../static/basic.js"></script>
 
 
     <style>
@@ -25,153 +26,89 @@
             margin-left: auto;
             margin-right: auto;
         }
-    </style>
-
-    <script>
-      function register(a, b) {
-          $.ajax({
-              type: "POST",
-              url: "/register",
-              dataType: 'json',
-              headers: {
-                  "Authorization": 'Bearer ' + $.cookie('jwt-token')
-              },
-              data: {
-                  time_give: a,
-                  type_give: b,
-              },
-              success: function(response) {
-                  if (response["result"] == "success") {
-                      alert("참가 완료!");
-                      window.location.reload();
-                  } else {
-                      alert("참가 실패!")
-                  }
-              }
-          })
-      }
-
-      function logout() {
-          $.ajax({
-              type: 'GET',
-              url: "/logout",
-              headers: {
-                  "Authorization": 'Bearer ' + $.cookie('jwt-token')
-              },
-              success: function(response) {
-                  if (response["result"] == "success") {
-                      alert("로그아웃 완료!");
-                      location.href = "/";
-                  } else {
-                      alert("로그아웃 실패!")
-                  }
-              }
-          })
-      }
-
-      function remaindTime() {
-            var now = new Date();
-            var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 24, 00, 00);
-            var open = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 09, 00, 00);
-
-            var nt = now.getTime();
-            var et = end.getTime();
-            var ot = open.getTime();
-            if (nt < ot) {
-                $('p.today').fadeIn();
-                $('.result').fadeIn();
-                $('button.reg_button').fadeOut();
-                $("p.text_title").html('신청 시작까지 남은 시간');
-                sec = parseInt(ot - nt) / 1000;
-            } else {
-                $('p.today').fadeOut();
-                $('.result').fadeOut();
-                $('button.reg_button').fadeIn();
-                $("p.text_title").html('신청 마감까지 남은 시간');
-                sec = parseInt(et - nt) / 1000;
-            }
-            day = parseInt(sec / 60 / 60 / 24);
-            sec = (sec - (day * 60 * 60 * 24));
-            hour = parseInt(sec / 60 / 60);
-            sec = (sec - (hour * 60 * 60));
-            min = parseInt(sec / 60);
-            sec = parseInt(sec - (min * 60));
-            if (hour < 10) {
-                hour = "0" + hour;
-            }
-            if (min < 10) {
-                min = "0" + min;
-            }
-            if (sec < 10) {
-                sec = "0" + sec;
-            }
-            $(".hours").html(hour);
-            $(".minutes").html(min);
-            $(".seconds").html(sec);
-
+        
+        .time_text {
+            display: none;
         }
-        setInterval(remaindTime, 1000);
-    </script>
-
+    </style>
 </head>
 
 <body>
     <div class="wrap pt-5">
+        <div class="weather">
+            <div class="CurrIcon"></div>
+            <div class="CurrTemp"></div>
+            <div class="City"></div>
         </div>
-        <div class="wrap pt-5">
-          {% if loginChecked %}
-          <div class="buttons is-right pt-3">
-              <a class="button is-success" href="login">로그인</a>
-              <a class="button is-light" href="signup">회원가입</a>
-          </div>
-          {% else %}
-          <div class="buttons is-right pt-3">
-              {{username}}님 환영합니다.
-              <button class="button is-success ml-3" onclick="logout()">로그아웃</button>
-          </div>
-          {% endif %}
-          <div class="has-text-centered pb-6">
-              <h1 class="title box has-background-success has-text-white">정글 운동 매칭 서비스</h1>
-          </div>
+
+        {% if loginChecked %}
+        <div class="buttons is-right pt-3">
+            <a class="button is-success" href="login">로그인</a>
+            <a class="button is-light" href="signup">회원가입</a>
+        </div>
+        {% else %}
+        <div class="buttons is-right pt-3">
+            {{username}}님 환영합니다.
+            <button class="button is-success ml-3" onclick="logout()">로그아웃</button>
+        </div>
+        {% endif %}
+        <div class="has-text-centered pb-6">
+            <h1 class="title box has-background-success has-text-white">정글 운동 매칭 서비스</h1>
+        </div>
 
         <div class="has-text-centered pb-6">
-            <p class="subtitle today" style="display:none">오늘 운동 신청 인원</p>
-        </div>      
-            <table class="table center">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>헬스</th>
-                        <th>러닝</th>
-                        <th>산책</th>
-                    </tr>
-                </thead>
-                {% for key, val in homeDict.items()%}
-                <tbody>
-                    <th>{{key}}</th>
-                    {% for status in val %}
-                    <td><button class="button is-white">{{(status["players"]|length)}}명</button><button class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button></td>
-                    {% endfor %}
-                </tbody>
-                {% endfor %}
-
-            </table>
-
-            <div class="box has-text-centered is-shadowless pt-6">
-                <p class="title text_title">신청 마감까지 남은 시간</p>
-                <div class="time title pt-3">
-                    <span class="hours"></span>
-                    <span class="col">:</span>
-                    <span class="minutes"></span>
-                    <span class="col">:</span>
-                    <span class="seconds"></span>
-                </div>
-                {% if not loginChecked %}
-                <a class="button is-info result" href="mypage">오늘의 매칭 결과 보기</a> {% else %}
-                <p class="result subtitle pt-3">매칭 결과를 보려면 로그인 하세요</p> {% endif %}
-            </div>
-
+            <p class="subtitle time_text" style="display:none">오늘 운동 신청 인원</p>
         </div>
+        <table class="table center">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>헬스</th>
+                    <th>러닝</th>
+                    <th>산책</th>
+                </tr>
+            </thead>
+            {% for key, val in homeDict.items()%}
+            <tbody>
+                <th>{{key}}</th>
+                {% for status in val %}
+                <td><button class="button is-white">{{(status["players"]|length)}}명</button>
+                    <button class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button>
+                    <progress class="progress is-small mt-2 is-info" value="{{(status["players"]|length)}}" max="8">20%</progress>
+                </td>
+                {% endfor %}
+            </tbody>
+            {% endfor %}
+
+        </table>
+
+        <div class="box has-text-centered is-shadowless pt-6">
+            <p class="title text_title">신청 마감까지 남은 시간</p>
+            <div class="time title pt-3">
+                <span class="hours"></span>
+                <span class="col">:</span>
+                <span class="minutes"></span>
+                <span class="col">:</span>
+                <span class="seconds"></span>
+            </div>
+            {% if not loginChecked %}
+            <a class="button is-info time_text" href="mypage">오늘의 매칭 결과 보기</a> {% else %}
+            <p class="time_text subtitle pt-3">매칭 결과를 보려면 로그인 하세요</p> {% endif %}
+        </div>
+
+        <!-- 모달창 만들어보기 -->
+        <div id="modal-comment" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                <div class="box">
+                    <p><h1>각오 한마디 해주세요!</h1></p>
+                    <textarea id="cmt" class="textarea" placeholder="같이 운동해요!!!"></textarea>
+                    <button class="button is-success" onclick="registerCmt()">등록</button>
+                </div>
+            </div>
+            <button class="modal-close is-large" aria-label="close"></button>
+        </div>  
+    </div>
 </body>
 
 </html>
