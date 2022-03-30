@@ -49,6 +49,7 @@
         {% else %}
         <div class="buttons is-right pt-3">
             {{username}}님 환영합니다.
+            <a class="button is-info" href="mypage">마이 페이지</a>
             <button class="button is-success ml-3" onclick="logout()">로그아웃</button>
         </div>
         {% endif %}
@@ -57,9 +58,9 @@
         </div>
 
         <div class="has-text-centered pb-6">
-            <p class="subtitle time_text" style="display:none">오늘 운동 신청 인원</p>
+            <p class="subtitle time_text" style="display:none">신청 마감되었습니다.</p>
         </div>
-        <table class="table center">
+        <table class="table center time_table" style="display:none">
             <thead>
                 <tr>
                     <th></th>
@@ -91,9 +92,6 @@
                 <span class="col">:</span>
                 <span class="seconds"></span>
             </div>
-            {% if not loginChecked %}
-            <a class="button is-info time_text" href="mypage">오늘의 매칭 결과 보기</a> {% else %}
-            <p class="time_text subtitle pt-3">매칭 결과를 보려면 로그인 하세요</p> {% endif %}
         </div>
 
         <!-- 모달창 만들어보기 -->

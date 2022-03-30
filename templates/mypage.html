@@ -40,6 +40,11 @@
       a.fa-solid{
         color:black;
       }
+
+      .box_width{
+        width: 500px;
+        margin: auto;
+      }
     </style>
     <script>
       function logout() {
@@ -95,17 +100,28 @@
         <h1 class="title">매칭 결과</h1>
       </div>
 
-      {% if (result['players']|length)>=2 %} {% set _dummy=result['players'].remove(username) %}
+      {% if (result['playerNames']|length)>=2 %} {% set _dummy=result['playerNames'].remove(username) %}
 
         <div class="has-text-centered pt-6">
             <!-- <p class="title pb-5">{{username}}님</p>  -->
-            <p class="subtitle">{% for player in result['players'][:-1]%}
+            <p class="subtitle">{% for player in result['playerNames'][:-1]%}
                 <strong>{{player}}</strong>님, {% endfor %}
-                <strong>{{result['players'][-1]}}</strong>님과 함께 <strong>{{result["type"]}}</strong>입니다.</p>
+                <strong>{{result['playerNames'][-1]}}</strong>님과 함께 <strong>{{result["type"]}}</strong>입니다.</p>
             <p class="subtitle">시간 : 아침 <strong>{{result['time'].split(':')[0][1]}}</strong>시</p>
             <p class="subtitle">장소 : {%if (result["type"] == 헬스)%} 강의동 지하 1층 헬스장 {%else%} 기숙사 앞{%endif%}</p>
-            <img id="imageid" src="">
-        </div>
+            <p><img id="imageid" src=""></p>
+ 
+           {% for s in result['players'] %}
+           <div class="box box_width">
+           {% for v in s.values() %}
+           {{v}} <br>
+           {% endfor %}
+          </div>
+
+           {% endfor %}
+
+
+
         {%else%}
         <div class="has-text-centered pt-6">
             <!-- <p class="title pb-5">{{username}}님</p>  -->
@@ -113,6 +129,8 @@
             <img src="/static/images/fail.png"> {% endif %}
 
         </div>
+
+
 
         <div class="has-text-centered">
           <script> 
