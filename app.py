@@ -66,8 +66,9 @@ def home():
     except ExpiredSignatureError:
         return render_template('index.html', loginChecked = "true", homeDict = homeDict)
     
+    loginUser = db.user.find_one({"userid": user})
     loginChecked = jti in jwt_blocklist
-    return render_template('index.html', homeDict = homeDict, loginChecked = loginChecked, username = user)
+    return render_template('index.html', homeDict = homeDict, loginChecked = loginChecked, username = loginUser['username'])
 
 @app.route('/mypage')
 def show_mypage():
@@ -89,7 +90,7 @@ def show_mypage():
     loginUser = db.user.find_one({"userid": user})
     if (not ("type" in loginUser) or not ("time" in loginUser)) :
         result = "신청한 운동이 없습니다."
-        return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result, userlog=loginUser['log'], count_data = count_data)
+        return render_template('mypage.html', loginChecked = loginChecked, username = loginUser['username'], result = result, userlog=loginUser['log'], count_data = count_data)
     else:
         registeredType = loginUser['type']
         registeredTime = loginUser['time']

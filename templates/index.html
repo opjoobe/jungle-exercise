@@ -76,7 +76,7 @@
                     {% if (status["players"]|length) < 8 %}
                     <button class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button>
                     {% else %}
-                    <button class="button is-danger" onclick="expired()">만료</button>
+                    <button class="button is-danger" onclick="expired()">만원</button>
                     {% endif %}
                     <progress class="progress is-small mt-2 is-info" value="{{(status["players"]|length)}}" max="8">20%</progress>
                 </td>
