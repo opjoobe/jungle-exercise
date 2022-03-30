@@ -11,7 +11,7 @@ from flask_jwt_extended.config import config
 from jwt.exceptions import (
     ExpiredSignatureError
 )
-
+ 
 #APSCHEDULER 1
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
