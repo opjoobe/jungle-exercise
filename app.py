@@ -7,7 +7,14 @@ from flask import Flask, render_template, jsonify, request
 from flask_jwt_extended import *
 import bcrypt, datetime
 
+#APSCHEDULER 1
+import time
+from apscheduler.schedulers.background import BackgroundScheduler
+
 app = Flask(__name__)
+
+#APSCHEDULER 2
+app.app_context().push()
 
 client = MongoClient('localhost', 27017)
 db = client.dbjungle
@@ -55,6 +62,29 @@ def show_login():
 @app.route('/signup', methods=['GET'])
 def show_signup():
     return render_template('signup.html')
+
+### APSCHEDULER 3 ###
+
+#@app.route('/kill', methods=["POST"])
+def show_reset():
+    with app.app_context():
+        time_L = list(db.user.find({"time" : {'$exists':True}}))
+        if time_L:
+            db.user.update_many({},{'$unset':{'time':True, 'type':True}})
+            return jsonify({"result":"초기화 완료"})
+        else:
+            return jsonify({"result":"등록한 사람이 없습니다."})
+
+#apscheduler 선언
+sched = BackgroundScheduler(daemon=True)
+
+#apscheduler 실행설정, Cron 방식으로, 1~53주간 실행, 월~일 실행, 8시 59분 55초 실행, hour='8', minute='59', second ='55'
+sched.add_job(show_reset, 'cron', week='1-53', day_of_week='0-6', second ='55')
+
+#apscheduler 실행
+sched.start()
+
+### APSCHEDULER END ###
 
 # API 역할을 하는 부분
 
