@@ -31,6 +31,10 @@ function registerCmt(existCmt = true) {
   let cmt = ""
   if (existCmt) {
     cmt = $('#cmt').val()
+    if (cmt == "") {
+      alert("코멘트를 입력해주세요!")
+      return null;
+    }
   } else {
     cmt = "같이 운동해요!!"
   }
@@ -119,8 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeModal($el) {
-    $el.classList.remove('is-active');
-    window.location.reload()
+    return null;
   }
 
   function closeAllModals() {
