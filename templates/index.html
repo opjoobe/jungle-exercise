@@ -121,22 +121,22 @@
         }
         setInterval(remaindTime, 1000);
 
-        $(document).ready(function(){
-            $.ajax({
-                url: 'https://api.openweathermap.org/data/2.5/weather?qSeoul&appid=f9d7a0fd2d6d72ccdcbd7efab92469e6&units=metric',
-                dataType: 'json',
-                type: 'GET',
-                success: function(data){
-                    var $Icon = (data.weather[0].icon);
-                    var $Temp = Math.floor(data.main.temp) + '도';
-                    var $city = data.name;
+        // $(document).ready(function(){
+        //     $.ajax({
+        //         url: 'https://api.openweathermap.org/data/2.5/weather?qSeoul&appid=f9d7a0fd2d6d72ccdcbd7efab92469e6&units=metric',
+        //         dataType: 'json',
+        //         type: 'GET',
+        //         success: function(data){
+        //             var $Icon = (data.weather[0].icon);
+        //             var $Temp = Math.floor(data.main.temp) + '도';
+        //             var $city = data.name;
 
-                     $('.CurrIcon').append('http://openweathermap.org/img/wn/' + $Icon + '@2x.png');
-                     $('.CurrTemp').prepend($Temp);
-                     $('.City').append($city);
-                }
-            })
-        });
+        //              $('.CurrIcon').append('http://openweathermap.org/img/wn/' + $Icon + '@2x.png');
+        //              $('.CurrTemp').prepend($Temp);
+        //              $('.City').append($city);
+        //         }
+        //     })
+        // });
     </script>
 
 </head>
@@ -144,11 +144,11 @@
 <body>
 
     <div class="wrap pt-5">
-        <div class="weather">
+        <!-- <div class="weather">
             <div class="CurrIcon"></div>
             <div class="CurrTemp"></div>
             <div class="City"></div>
-        </div>
+        </div> -->
         
         {% if loginChecked %}
         <div class="buttons is-right pt-3">
@@ -156,9 +156,11 @@
             <a class="button is-light" href="signup">회원가입</a>
         </div>
         {% else %}
+        
         <div class="buttons is-right pt-3">
-            {{username}}님 환영합니다.
-            <button class="button is-success ml-3" onclick="logout()">로그아웃</button>
+            <strong>{{username}}</strong>님 환영합니다.
+            <a class="button is-info" href="mypage">마이페이지</a>
+            <button class="button is-light ml-3" onclick="logout()">로그아웃</button>
         </div>
         {% endif %}
         <div class="has-text-centered pb-6">

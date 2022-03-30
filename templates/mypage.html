@@ -67,8 +67,8 @@
         </div>
         {% else %}
         <div class="buttons is-right pt-3">
-            {{username}}님 환영합니다.
-            <button class="button is-success ml-3" onclick="logout()">
+            <strong>{{username}}</strong>님 환영합니다.
+            <button class="button is-light ml-3" onclick="logout()">
           로그아웃
         </button>
         </div>
@@ -105,12 +105,43 @@
 
         <div class="has-text-centered">
            <script> 
-            {% set h_list = [] %} {% set w_list = [] %} {% set r_list = [] %} {% for k, v in userlog.items() %} {%if v == '헬스' %} {{h_list.append(k)}} {% elif v == '산책' %} {{w_list.append(k)}} {% else %} {{r_list.append(k)}} {% endif %} {% endfor %}
+            {% set h_list = [] %} 
+            {% set w_list = [] %} 
+            {% set r_list = [] %} 
+
+            {% for k, v in userlog.items() %} 
+                {%if v == '헬스' %} 
+                    {{h_list.append(k)}} 
+                {% elif v == '산책' %} 
+                    {{w_list.append(k)}} 
+                {% else %} 
+                    {{r_list.append(k)}} 
+                {% endif %} 
+            {% endfor %}
             </script>
-            <p class="title">운동 기록</p>
-            <p>헬스 횟수 : {{h_list|length}}, 운동한 날 : {% for day in h_list %}<span>{{day[:2]}}월{{day[2:]}}일   </span>{%endfor%}</p>
-            <p>산책 횟수 : {{w_list|length}}, 운동한 날 : {% for day in w_list %}<span>{{day[:2]}}월{{day[2:]}}일   </span>{%endfor%}</p>
-            <p>러닝 횟수 : {{r_list|length}}, 운동한 날 : {% for day in r_list %}<span>{{day[:2]}}월{{day[2:]}}일   </span>{%endfor%}</p>
+
+            <p class="title pt-6">운동 기록</p>
+            <table class="table center has-text-centered">
+                <thead>
+                    <th>헬스</th>
+                    <th>산책</th>
+                    <th>러닝</th>
+                    <th>종합</th>
+                </thead>
+                <tbody>
+                    <th>
+                        <p>{{h_list|length}}번 </p><p> {% for day in h_list %}<p>{{day[:2]}}월{{day[2:]}}일 </p>  </span>{%endfor%}
+                    </th>
+                    <th>  
+                        <p>{{w_list|length}}번</p><p>  {% for day in w_list %}<p>{{day[:2]}}월{{day[2:]}}일</p>   </span>{%endfor%}
+                    </th>
+                    <th>
+                        <p>{{r_list|length}}번 </p> {% for day in r_list %}<p>{{day[:2]}}월{{day[2:]}}일</p>   {%endfor%}
+                    </th>
+                       
+                    <th></th>
+                </tbody>
+            </table>   
         </div>
 
         <p class="title pt-6 has-text-centered">운동 랭킹</p>
