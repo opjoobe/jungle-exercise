@@ -223,19 +223,11 @@ def registerCmt() :
     inputData = request.form
     cmt = inputData['comment'].strip()
 
-    if (cmt == "") :
-        return jsonify({
-            "result" : "fail",
-            "msg" : "코멘트를 입력해주세요"
-        })
-    else :
-        print(tempUser.id)
-        print(db.user.find_one({'userid':tempUser.id}))
-        db.user.update_one({'userid':tempUser.id},{'$set':{"comment": cmt}})
-        return jsonify({
-            "result" : "success",
-            "msg" : "코멘트 저장 완료"
-        })
+    db.user.update_one({'userid':tempUser.id},{'$set':{"comment": cmt}})
+    return jsonify({
+        "result" : "success",
+        "msg" : "코멘트 저장 완료"
+    })
 
 
 

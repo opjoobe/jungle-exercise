@@ -99,14 +99,21 @@
         <!-- 모달창 만들어보기 -->
         <div id="modal-comment" class="modal">
             <div class="modal-background"></div>
-            <div class="modal-content">
-                <div class="box">
-                    <p><h1>각오 한마디 해주세요!</h1></p>
-                    <textarea id="cmt" class="textarea" placeholder="같이 운동해요!!!"></textarea>
-                    <button class="button is-success" onclick="registerCmt()">등록</button>
-                </div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">각오 한마디 해주세요!<span style="font-size:0.8em">(50자 이내)</span></p>
+                    <button class="delete" onclick="registerCmt(false)"></button>
+                </header>
+                <section class="modal-card-body">
+                    <textarea id="cmt" class="textarea" maxlength="50" placeholder="같이 운동해요!!!"></textarea>
+                </section>
+                <footer class="modal-card-foot">
+                    <div style="margin:auto">
+                        <button class="button is-success" onclick="registerCmt()">등록</button>
+                        <button class="button" onclick="registerCmt(false)">등록안함</button>
+                    </div>
+                </footer>
             </div>
-            <button class="modal-close is-large" aria-label="close"></button>
         </div>  
     </div>
 </body>

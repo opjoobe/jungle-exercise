@@ -27,8 +27,13 @@ function register(a, b) {
     })
 }
 
-function registerCmt() {
-  cmt = $('#cmt').val()
+function registerCmt(existCmt = true) {
+  let cmt = ""
+  if (existCmt) {
+    cmt = $('#cmt').val()
+  } else {
+    cmt = "같이 운동해요!!"
+  }
   $.ajax({
     type: "POST",
     url: "/register/comment",
@@ -37,16 +42,15 @@ function registerCmt() {
         comment: cmt
     },
     success: function(response) {
-
-        if (response["result"] == "success") {
-            alert("참가 완료!");
-            window.location.reload()
-        } else {
-            alert("로그인 후 이용해주세요~!")
-            window.location.reload()
-        }
+      if (response["result"] == "success") {
+          alert("참가 완료!");
+          window.location.reload()
+      } else {
+          alert("로그인 후 이용해주세요~!")
+          window.location.reload()
+      }
     }
-})
+  })
 }
 
 function logout() {
@@ -116,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeModal($el) {
     $el.classList.remove('is-active');
+    window.location.reload()
   }
 
   function closeAllModals() {
