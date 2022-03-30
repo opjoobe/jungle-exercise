@@ -5,21 +5,18 @@ from wsgiref.util import request_uri
 from pymongo import MongoClient
 from flask import Flask, render_template, jsonify, request
 from flask_jwt_extended import *
-import bcrypt, datetime, time
+import bcrypt, datetime
 from flask_jwt_extended.config import config
 
 from jwt.exceptions import (
     ExpiredSignatureError
 )
 
+#APSCHEDULER 1
+import time
+from apscheduler.schedulers.background import BackgroundScheduler
+
 app = Flask(__name__)
-
-client = MongoClient('localhost', 27017)
-db = client.dbjungle
-
-times = ["06:00","07:00","08:00"]
-types = ["헬스", "러닝", "산책"]
-user = ""
 
 app.config.update(
     DEBUG=True,
@@ -27,6 +24,16 @@ app.config.update(
     JWT_TOKEN_LOCATION=["headers", "cookies"]
 )
 
+#APSCHEDULER 2
+app.app_context().push()
+
+client = MongoClient('localhost', 27017)
+db = client.dbjungle
+
+times = ["06:00","07:00","08:00"]
+types = ["헬스", "러닝", "산책"]
+
+#JWT 매니저 활성화
 jwt = JWTManager(app)
 jwt_blocklist = set()
 
@@ -34,6 +41,29 @@ jwt_blocklist = set()
 def check_if_token_is_revoked(jwt_header, jwt_payload) :
 	jti = jwt_payload['jti']
 	return jti in jwt_blocklist
+
+### APSCHEDULER 3 ###
+
+@app.route('/kill', methods=["POST"])
+def show_reset():
+    with app.app_context():
+        time_L = list(db.user.find({"time" : {'$exists':True}}))
+        if time_L:
+            db.user.update_many({},{'$unset':{'time':True, 'type':True}})
+            return jsonify({"result":"초기화 완료"})
+        else:
+            return jsonify({"result":"등록한 사람이 없습니다."})
+
+#apscheduler 선언
+sched = BackgroundScheduler(daemon=True, timezone="Asia/Seoul")
+
+#apscheduler 실행설정, Cron 방식으로, 1~53주간 실행, 월~일 실행, 8시 59분 55초 실행, hour='8', minute='59', second ='55'
+sched.add_job(show_reset, 'cron', week='1-53', day_of_week='0-6', hour='8', minute='59', second ='55')
+
+#apscheduler 실행
+sched.start()
+
+### APSCHEDULER END ###
 
 # HTML 화면 보여주기 
 @app.route('/')

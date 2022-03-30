@@ -69,17 +69,48 @@
           })
       }
 
-      // function time() {
-      //     let today = new Date();
+      function remaindTime() {
+            var now = new Date();
+            var end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 24, 00, 00);
+            var open = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 09, 00, 00);
 
-      //     let hours = today.getHours();
+            var nt = now.getTime();
+            var et = end.getTime();
+            var ot = open.getTime();
+            if (nt < ot) {
+                $('p.today').fadeIn();
+                $('.result').fadeIn();
+                $('button.reg_button').fadeOut();
+                $("p.text_title").html('신청 시작까지 남은 시간');
+                sec = parseInt(ot - nt) / 1000;
+            } else {
+                $('p.today').fadeOut();
+                $('.result').fadeOut();
+                $('button.reg_button').fadeIn();
+                $("p.text_title").html('신청 마감까지 남은 시간');
+                sec = parseInt(et - nt) / 1000;
+            }
+            day = parseInt(sec / 60 / 60 / 24);
+            sec = (sec - (day * 60 * 60 * 24));
+            hour = parseInt(sec / 60 / 60);
+            sec = (sec - (hour * 60 * 60));
+            min = parseInt(sec / 60);
+            sec = parseInt(sec - (min * 60));
+            if (hour < 10) {
+                hour = "0" + hour;
+            }
+            if (min < 10) {
+                min = "0" + min;
+            }
+            if (sec < 10) {
+                sec = "0" + sec;
+            }
+            $(".hours").html(hour);
+            $(".minutes").html(min);
+            $(".seconds").html(sec);
 
-      //     let minutes = today.getMinutes();
-
-      //     let seconds = today.getSeconds();
-
-      //     console.log(hours + ':' + minutes + ':' + seconds)
-      // }
+        }
+        setInterval(remaindTime, 1000);
     </script>
 
 </head>
@@ -103,7 +134,9 @@
               <h1 class="title box has-background-success has-text-white">정글 운동 매칭 서비스</h1>
           </div>
 
-
+        <div class="has-text-centered pb-6">
+            <p class="subtitle today" style="display:none">오늘 운동 신청 인원</p>
+        </div>      
             <table class="table center">
                 <thead>
                     <tr>
@@ -124,11 +157,20 @@
 
             </table>
 
-            <div class="has-text-centered pt-6">
-                <h1 class="title">마감까지 - 시간 - 분 남았습니다.</h1>
+            <div class="box has-text-centered is-shadowless pt-6">
+                <p class="title text_title">신청 마감까지 남은 시간</p>
+                <div class="time title pt-3">
+                    <span class="hours"></span>
+                    <span class="col">:</span>
+                    <span class="minutes"></span>
+                    <span class="col">:</span>
+                    <span class="seconds"></span>
+                </div>
+                {% if not loginChecked %}
+                <a class="button is-info result" href="mypage">오늘의 매칭 결과 보기</a> {% else %}
+                <p class="result subtitle pt-3">매칭 결과를 보려면 로그인 하세요</p> {% endif %}
             </div>
 
-            <a href="mypage">결과창</a>
         </div>
 </body>
 
