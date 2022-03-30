@@ -65,27 +65,30 @@ def home():
 def show_mypage():
     jwtToken = request.cookies.get('jwt-token')
     if jwtToken is None :
-        return render_template('mypage.html', loginChecked = True)
+        return render_template('login.html')
 
     try:
         jti = decode_token(jwtToken)['jti']
         user = decode_token(jwtToken).get(config.identity_claim_key, None)
     except ExpiredSignatureError:
-        return render_template('mypage.html', loginChecked = "true")
+        return render_template('login.html')
     
     loginChecked = jti in jwt_blocklist
     
     loginUser = db.user.find_one({"userid": user})
-    registeredType = loginUser['type']
-    registeredTime = loginUser['time']
-    
-    players = []
-    for player in list(db.user.find({"time":registeredTime,"type":registeredType})):
-        players.append(player['username'])
-    result = {"type" : registeredType, "time" : registeredTime, "players" : players}
-    
-    return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result)
+    if (not ("type" in loginUser) or not ("time" in loginUser)) :
+        result = "신청한 운동이 없습니다."
+        return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result)
+    else:
+        registeredType = loginUser['type']
+        registeredTime = loginUser['time']
 
+        players = []
+        for player in list(db.user.find({"time":registeredTime,"type":registeredType})):
+            players.append(player['username'])
+        result = {"type" : registeredType, "time" : registeredTime, "players" : players}
+        
+        return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result, userlog = loginUser['log'])
 
 @app.route('/login')
 def show_login():
