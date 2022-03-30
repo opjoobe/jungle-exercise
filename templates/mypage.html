@@ -14,6 +14,7 @@
       crossorigin="anonymous"
     ></script>
     <script src="../static/jquery.cookie.js"></script>
+    <script src="https://kit.fontawesome.com/634611fe9c.js" crossorigin="anonymous"></script>
 
     <style>
       .wrap {
@@ -34,6 +35,10 @@
       img{
         width: auto;
         height: 300px;
+      }
+
+      a.fa-solid{
+        color:black;
       }
     </style>
     <script>
@@ -65,20 +70,21 @@
 
   <body>
     <div class="wrap pt-5">
-      {% if loginChecked %}
-      <div class="buttons is-right pt-3">
-        <a class="button is-success" href="login">로그인</a>
-        <a class="button is-light" href="signup">회원가입</a>
-      </div>
-      {% else %}
-      <div class="buttons is-right pt-3">
-        {{username}}님 환영합니다.
-        <button class="button is-success ml-3" onclick="logout()">
+      <nav class="level">
+        <div class="level-left">
+          <a class="level-item pl-4 fa-solid fa-house fa-2xl" href="/"></a>
+          <!-- <a class="button is-info level-item" href="/">홈으로</a> -->
+        </div>
+        <div class="level-right">
+          <p class="level-item"><strong>{{username}}</strong>님 환영합니다.</p>
+          
+          <button class="button level-item is-light ml-3" onclick="logout()">
           로그아웃
-        </button>
-      </div>
-      {% endif %}
+          </button>
+        </div>
+          
 
+    </nav>
       <div class="has-text-centered pb-6">
         <h1 class="title box has-background-success has-text-white">
           정글 운동 매칭 서비스
@@ -109,19 +115,46 @@
         </div>
 
         <div class="has-text-centered">
-           <script> 
-            {% set h_list = [] %} {% set w_list = [] %} {% set r_list = [] %} {% for k, v in userlog.items() %} {%if v == '헬스' %} {{h_list.append(k)}} {% elif v == '산책' %} {{w_list.append(k)}} {% else %} {{r_list.append(k)}} {% endif %} {% endfor %}
-            </script>
-            <p class="title">운동 기록</p>
-            <p>헬스 횟수 : {{h_list|length}}, 운동한 날 : {% for day in h_list %}<span>{{day[:4]}}년{{day[4:6]}}월{{day[6:]}}일   </span>{%endfor%}</p>
-            <p>산책 횟수 : {{w_list|length}}, 운동한 날 : {% for day in w_list %}<span>{{day[:4]}}년{{day[4:6]}}월{{day[6:]}}일   </span>{%endfor%}</p>
-            <p>러닝 횟수 : {{r_list|length}}, 운동한 날 : {% for day in r_list %}<span>{{day[:4]}}년{{day[4:6]}}월{{day[6:]}}일   </span>{%endfor%}</p>
-        </div>
+          <script> 
+           {% set h_list = [] %} 
+           {% set w_list = [] %} 
+           {% set r_list = [] %} 
 
-        <p class="title pt-6 has-text-centered">운동 랭킹</p>
+           {% for k, v in userlog.items() %} 
+               {%if v == '헬스' %} 
+                   {{h_list.append(k)}} 
+               {% elif v == '산책' %} 
+                   {{w_list.append(k)}} 
+               {% else %} 
+                   {{r_list.append(k)}} 
+               {% endif %} 
+           {% endfor %}
+           </script>
+
+           <p class="title pt-6">운동 기록</p>
+           <table class="table center has-text-centered">
+               <thead>
+                   <th>헬스</th>
+                   <th>산책</th>
+                   <th>러닝</th>
+               </thead>
+               <tbody>
+                   <th>
+                       <p>{{h_list|length}}번</p><br> {% for day in h_list %}<p>{{day[4:6]}}월{{day[6:]}}일 </p>  </span>{%endfor%}
+                   </th>
+                   <th>  
+                       <p>{{w_list|length}}번</p><br>  {% for day in w_list %}<p>{{day[4:6]}}월{{day[6:]}}일</p>   </span>{%endfor%}
+                   </th>
+                   <th>
+                       <p>{{r_list|length}}번</p><br> {% for day in r_list %}<p>{{day[4:6]}}월{{day[6:]}}일</p>   {%endfor%}
+               </tbody>
+           </table>   
+       </div>
+
+        <p class="title has-text-centered">운동 랭킹</p>
 <table class="table center has-text-centered">
 
-    {{count_data[0]['health_count'] + count_data[0]['walking_count'] + count_data[0]['running_count']}}
+  
     <thead>
         <th>헬스</th>
         <th>산책</th>
