@@ -82,13 +82,14 @@ def show_mypage():
     else:
         registeredType = loginUser['type']
         registeredTime = loginUser['time']
+        dataAll = db.user.find({},{'_id':False, 'username': 1, 'log': 1})
 
         players = []
         for player in list(db.user.find({"time":registeredTime,"type":registeredType})):
             players.append(player['username'])
         result = {"type" : registeredType, "time" : registeredTime, "players" : players}
         
-        return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result, userlog = loginUser['log'])
+        return render_template('mypage.html', loginChecked = loginChecked, username = user, result = result, userlog = loginUser['log'], all = dataAll)
 
 @app.route('/login')
 def show_login():
