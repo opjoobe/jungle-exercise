@@ -96,14 +96,14 @@ def show_mypage():
         registeredTime = loginUser['time']
     
     ####################################################
-        players = []
+        playerNames = []
         for player in list(db.user.find({"time":registeredTime,"type":registeredType})):
-            players.append(player['username'])
+            playerNames.append(player['username'])
 
         # 같은 운동 및 시간 신청한 사람들의 이름과 코멘트 전달      
         # Client에서 players로 받던 데이타 for문으로 변경 필요함
-        # players = db.user.find({"time":registeredTime,"type":registeredType},{"_id":False,"username":True,"comment":True})
-        result = {"type" : registeredType, "time" : registeredTime, "players" : players}
+        players = db.user.find({"time":registeredTime,"type":registeredType},{"_id":False,"username":True,"comment":True})
+        result = {"type" : registeredType, "time" : registeredTime, "playerNames" : playerNames, "players" : players}
 
     # count_data 추가로 전달 ############################
         return render_template('mypage.html', loginChecked = loginChecked, username = loginUser['username'], result = result, userlog=loginUser['log'], count_data = count_data)

@@ -17,7 +17,7 @@ def setTest() :
         db.junglers.insert_one(doc)
 
     types = ["헬스","러닝","산책"]
-    dates = [str(x) for x in range(20220320,20220330)]
+    allDates = [str(x) for x in range(20220320,20220330)]
 
     hashedPw = bcrypt.hashpw('1234'.encode('utf-8'), bcrypt.gensalt())
 
@@ -29,6 +29,7 @@ def setTest() :
         walking_count = 0
         running_count = 0
         log = {}
+        dates = allDates[:random.randrange(4,11)]
         for date in dates:
             type = types[random.randrange(3)]
             log[date] = type
