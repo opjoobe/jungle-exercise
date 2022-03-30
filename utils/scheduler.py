@@ -56,7 +56,7 @@ sched = BackgroundScheduler(daemon=True, timezone="Asia/Seoul")
 
 
 #apscheduler 실행설정, Cron 방식으로, 1~53주간 실행, 월~일 실행, 8시 59분 55초 실행, hour='8', minute='59', second ='55'
-sched.add_job(show_reset, 'cron', week='1-53', day_of_week='0-6', hour='16', minute='50', second ='00')
+sched.add_job(show_reset, 'cron', week='1-53', day_of_week='0-6', hour='8', minute='59', second ='55')
 
 
 #apscheduler 실행
