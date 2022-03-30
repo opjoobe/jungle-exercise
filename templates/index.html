@@ -61,7 +61,7 @@
               success: function(response) {
                   if (response["result"] == "success") {
                       alert("로그아웃 완료!");
-                      window.location.reload();
+                      location.href = "/";
                   } else {
                       alert("로그아웃 실패!")
                   }

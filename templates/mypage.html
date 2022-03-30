@@ -42,7 +42,7 @@
           success: function (response) {
             if (response["result"] == "success") {
               alert("로그아웃 완료!");
-              window.location.reload();
+              location.href = "/";
             } else {
               alert("로그아웃 실패!");
             }
@@ -78,7 +78,7 @@
         <h1 class="title">매칭 결과</h1>
       </div>
 
-      {% if (result['players']|length)>=1 %}
+      {% if (result['players']|length)>=2 %}
       <button class="button is-white">
         {{ result['time'] }} {{result["type"]}}{{result["players"]}}
       </button>

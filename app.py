@@ -8,6 +8,10 @@ from flask_jwt_extended import *
 import bcrypt, datetime, time
 from flask_jwt_extended.config import config
 
+from jwt.exceptions import (
+    ExpiredSignatureError
+)
+
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
@@ -46,10 +50,13 @@ def home():
     jwtToken = request.cookies.get('jwt-token')
     if jwtToken is None : return render_template('index.html', loginChecked = "true", homeDict = homeDict)
 
-    jti = decode_token(jwtToken)['jti']
-    user = decode_token(jwtToken).get(config.identity_claim_key, None)
+    try: 
+        jti = decode_token(jwtToken)['jti']
+        user = decode_token(jwtToken).get(config.identity_claim_key, None)
+    except ExpiredSignatureError:
+        return render_template('index.html', loginChecked = "true", homeDict = homeDict)
+    
     loginChecked = jti in jwt_blocklist
-
     return render_template('index.html', homeDict = homeDict, loginChecked = loginChecked, username = user)
 
     
@@ -58,10 +65,15 @@ def home():
 @app.route('/mypage')
 def show_mypage():
     jwtToken = request.cookies.get('jwt-token')
-    if jwtToken is None : return render_template('mypage.html', loginChecked = True)
+    if jwtToken is None :
+        return render_template('mypage.html', loginChecked = True)
 
-    jti = decode_token(jwtToken)['jti']
-    user = decode_token(jwtToken).get(config.identity_claim_key, None)
+    try:
+        jti = decode_token(jwtToken)['jti']
+        user = decode_token(jwtToken).get(config.identity_claim_key, None)
+    except ExpiredSignatureError:
+        return render_template('mypage.html', loginChecked = "true")
+    
     loginChecked = jti in jwt_blocklist
     
     loginUser = db.user.find_one({"userid": user})
