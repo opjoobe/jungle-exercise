@@ -44,6 +44,11 @@
                     time_give: a,
                     type_give: b,
                 },
+                error: function(error) {
+                    alert('로그인 후 이용해주세요!');
+                    window.location.reload()
+                },
+
                 success: function(response) {
                     if (response["result"] == "success") {
                         alert("참가 완료!");
@@ -67,7 +72,7 @@
                         alert("로그아웃 완료!");
                         location.href = "/";
                     } else {
-                        alert("로그아웃 실패!")
+                        alert(response['msg'])
                     }
                 }
             })
@@ -152,7 +157,9 @@
             <tbody>
                 <th>{{key}}</th>
                 {% for status in val %}
-                <td><button class="button is-white">{{(status["players"]|length)}}명</button><button class="button is-success" onclick="register('{{key}}', '{{(status[" type "])}}')">참가</button></td>
+                <td><button class="button is-white">{{(status["players"]|length)}}명</button>
+                    <button class="button is-success" onclick="register('{{key}}', '{{(status[" type "])}}')">참가</button>
+                </td>
                 {% endfor %}
             </tbody>
             {% endfor %}
