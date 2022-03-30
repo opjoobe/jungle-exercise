@@ -3,7 +3,7 @@ from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
 db = client.dbjungle
 
-class Init_db:
+class Init_Jungler_DB:
     @staticmethod
     def insert_all():
         db.junglers.drop()

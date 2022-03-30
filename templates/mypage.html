@@ -44,7 +44,7 @@
               alert("로그아웃 완료!");
               location.href = "/";
             } else {
-              alert("로그아웃 실패!");
+              alert(response["msg"]);
             }
           },
         });
