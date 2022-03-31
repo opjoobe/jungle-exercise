@@ -142,6 +142,7 @@ def signup():
     #정글 a반 인원인지 and 이미가입된 회원은 아닌지 확인 후 등록
     junglerFound = db.junglers.find_one({"username" : userName}, {'_id': False})
     userFound = db.user.find_one({"username" : userName}, {'_id': False})
+    userIdFound = db.user.find_one({"userid" : userId}, {'_id' : False})
 
     if (junglerFound is None) :
         return jsonify({
@@ -152,6 +153,11 @@ def signup():
         return jsonify({
             "result" : "fail",
             "msg": "이미 가입된 회원입니다."
+            })
+    elif (userIdFound is not None) :
+        return jsonify({
+            "result" : "fail",
+            "msg": "중복된 ID 입니다."
             })
     else :
         # db에 rank 추가 ##################################
