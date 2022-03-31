@@ -4,7 +4,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mini Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="정글 운동 매칭 서비스" />
+    <meta property="og:image" content="../static/images/헬스.png" />
+    <meta
+      property="og:description"
+      content="정글 4기 A반 정글러들을 위한 운동 매칭 서비스입니다."
+    />
+    <title>정글 운동 매칭 서비스</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="../static/jquery.cookie.js"></script>
@@ -53,7 +60,7 @@
         <div class="has-text-centered pb-6">
             <p class="subtitle time_text" style="display:none">오늘 운동 신청 인원</p>
         </div>
-        <table class="table center">
+        <table style="text-align: center;" class="table center">
             <thead>
                 <tr>
                     <th></th>
@@ -66,7 +73,8 @@
             <tbody>
                 <th>{{key}}</th>
                 {% for status in val %}
-                <td><button class="button is-white">{{(status["players"]|length)}}명</button>
+                <td>
+                    <button class="button is-white">{{(status["players"]|length)}}명</button>
                     {% if (status["players"]|length) < 8 %}
                     <button class="button is-success" onclick="register('{{key}}', '{{(status["type"])}}')">참가</button>
                     {% else %}
