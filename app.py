@@ -72,25 +72,31 @@ def home():
 
 @app.route('/mypage')
 def show_mypage():
+    #token 없을경우 login페이지 rediect
     jwtToken = request.cookies.get('jwt-token')
     if jwtToken is None :
         return render_template('login.html')
 
+    #token 만료된 경우 login페이지 rediect
     try:
         jti = decode_token(jwtToken)['jti']
         user = decode_token(jwtToken).get(config.identity_claim_key, None)
     except ExpiredSignatureError:
         return render_template('login.html')
     
+    #logout된 token의 경우 login페이지 rediect
     loginChecked = jti in jwt_blocklist
+    if loginChecked :
+        return render_template('login.html')
     
+    #유효한 token의 경우
     # 전달해줄 count_data 생성 #########################
     count_data = list(db.user_rank.find({},{"_id":False, "username":1, "total_count" : 1, "health_count" : 1, "walking_count" : 1, "running_count" : 1}))
 
     loginUser = db.user.find_one({"userid": user})
     if (not ("type" in loginUser) or not ("time" in loginUser)) :
         result = "신청한 운동이 없습니다."
-        return render_template('mypage.html', loginChecked = loginChecked, username = loginUser['username'], result = result, userlog=loginUser['log'], count_data = count_data)
+        return render_template('mypage.html', username = loginUser['username'], result = result, userlog=loginUser['log'], count_data = count_data)
     else:
         registeredType = loginUser['type']
         registeredTime = loginUser['time']
@@ -106,7 +112,7 @@ def show_mypage():
         result = {"type" : registeredType, "time" : registeredTime, "playerNames" : playerNames, "players" : players}
 
     # count_data 추가로 전달 ############################
-        return render_template('mypage.html', loginChecked = loginChecked, username = loginUser['username'], result = result, userlog=loginUser['log'], count_data = count_data)
+        return render_template('mypage.html', username = loginUser['username'], result = result, userlog=loginUser['log'], count_data = count_data)
     ####################################################
 
         

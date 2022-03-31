@@ -163,20 +163,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-$(document).ready(function(){
-  $.ajax({
-      url: 'https://api.openweathermap.org/data/2.5/weather?qSeoul&appid=f9d7a0fd2d6d72ccdcbd7efab92469e6&units=metric',
-      dataType: 'json',
-      type: 'GET',
-      success: function(data){
-          var $Icon = (data.weather[0].icon);
-          var $Temp = Math.floor(data.main.temp) + '도';
-          var $city = data.name;
-
-           $('.CurrIcon').append('http://openweathermap.org/img/wn/' + $Icon + '@2x.png');
-           $('.CurrTemp').prepend($Temp);
-           $('.City').append($city);
-      }
-  })
-});
